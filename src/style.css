@@ -1,11 +1,12 @@
-/* @font-face {
-  font-family: "ArtDystopia";
-  src: url("./ArtDystopia.otf") format("opentype");
-} */
+@font-face {
+  font-family: "Art Dystopia";
+  src: url("ArtDystopia.otf");
+}
 *
 {
     margin: 0;
     padding: 0;
+
 }
 
 html,
@@ -20,13 +21,19 @@ body
     top: 0;
     left: 0;
     outline: none;
+    pointer-events: none;
 }
 
 .texture{
   /* visibility: hidden;  */
 }
 
-.play{
+#play{
+  font-size: 6em;
+  font-family: 'Art Dystopia';
   position: fixed;
-  z-index: 1;
+  z-index: -1;
+  margin-left: 40%;
+  margin-top: 70vh;
+  cursor: pointer;
 }

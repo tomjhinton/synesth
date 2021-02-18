@@ -4,11 +4,13 @@ uniform vec3 uPosition;
 uniform vec3 uRotation;
 
 uniform sampler2D uTexture;
-uniform float uFrequency;
 
-varying vec2 vUv;
+
 varying float vElevation;
 varying float vTime;
+
+uniform sampler2D tAudioData;
+varying vec2 vUv;
 
 float random(vec2 st)
 {
@@ -110,40 +112,44 @@ float pModPolar(inout vec2 p, float repetitions) {
 
 
 
-void main()
-{
+void main() {
 
-vec2 pos = vUv - 0.5;
+				float r = texture2D( tAudioData, vec2( vUv.y, 0.0 ) ).r;
+        vec2 pos = vUv - 0.5;
 vec2 size = vec2(0.5, 0.5);
-pModPolar(pos, cos(vTime * 0.2)*8.0);
-pModPolar(pos, sin(vTime * 0.2)*4.0);
 
 
-vec3 brightness = vec3(cos(vTime * 0.5));
-vec3 contrast = vec3(sin(vTime * 0.5));
+
+
+vec3 brightness = vec3(0.5);
+vec3 contrast = vec3(0.5);
 vec3 contrast2 = vec3(0.6);
 vec3 osc = vec3(0.4,0.3,0.2);
 vec3 phase = vec3(0.5);
 
 float shape = circ(pos);
-pModPolar(pos, cos(vTime * 0.2)*4.0);
+pModPolar(pos, cos(vTime * 0.2)*(r *5.0));
 float shape2 = sdEquilateralTriangle(pos);
 
 
-pos -= vec2(sin(vTime) * 0.2, cos(vTime) * 0.2);
+// pos -= vec2(sin(vTime) * 0.2, cos(vTime) * 0.2);
 
-float shape3 = sdBox(pos, vec2(0.09));
+float shape3 = sdBox(pos, vec2(r));
 shape3 = ceil(shape3);
 
-vec3 col = cosPalette((vTime* 0.2) + min(shape, shape3), brightness, contrast, osc, phase);
-vec3 col2 = cosPalette((vTime* 0.2) + shape2, brightness, contrast2, osc, phase);
+vec3 col = cosPalette((vTime * 0.2)+ min(shape, shape3), brightness, contrast, osc, phase);
+// vec3 col2 = cosPalette((vTime* r) + shape2, brightness, contrast2, osc, phase);
 
-float strength = cnoise(vUv * 10.0+sin(vTime)*2.0 + +cos(vTime));
+float strength = cnoise(vUv * sin(vTime)*2.0 + +cos(vTime));
 
-col *= col2;
-
-col.r *= strength;
-
-gl_FragColor = vec4(col, 0.8);
+// col *= col2;
+if(r >0.5){
+  r += strength;
 
 }
+
+gl_FragColor = vec4(col, r);
+
+
+
+			}

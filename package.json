@@ -28,6 +28,7 @@
     "style-loader": "^2.0.0",
     "three": "^0.125.1",
     "tone": "^14.7.77",
+    "url-loader": "^4.1.1",
     "webpack": "^5.18.0",
     "webpack-cli": "^4.4.0",
     "webpack-dev-server": "^3.11.2",

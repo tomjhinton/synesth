@@ -9,30 +9,32 @@ import * as Tone from 'tone'
 import vertexShader from './shaders/one/vertex.glsl'
 import fragmentShader from './shaders/one/fragment.glsl'
 
+let mediaElement
+let playing = false
+let ready = false
+const play = document.getElementById('play')
+play.addEventListener('click', function (e) {
+  if(!playing && ready){
+    sound.play();
+    playing = true
+    play.style.display = "none";
+  }
 
 
+
+});
 
 /**
  * Base
  */
 // Debug
 
-const player = new Tone.Player('/assets/music/Forever.mp3').toDestination()
-Tone.loaded().then(() => {
-  player.start()
-  player.connect(analyser)
-})
-
-const analyser = new Tone.Analyser('waveform', 32)
-
-console.log(analyser.getValue() + 'hiya')
-
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-scene.background = new THREE.Color( 0xffffff )
+//scene.background = new THREE.Color( 0xffffff )
 
 /**
  * Textures
@@ -40,16 +42,14 @@ scene.background = new THREE.Color( 0xffffff )
 const textureLoader = new THREE.TextureLoader()
 const texture = textureLoader.load('./textures/texture.png')
 
-/**
- * Test mesh
- */
+
 
 //geometry
-const geometry =  new THREE.PlaneGeometry( 1, 1, 100, 100 )
+// const geometry =  new THREE.PlaneGeometry( 1, 1, 100, 100 )
 
 // const geometry = new THREE.SphereGeometry(4,128, 128)
 
-// const geometry =  new THREE.BoxGeometry( 2, 2, 2, 100, 100, 100 )
+const geometry =  new THREE.BoxGeometry( 2, 2, 2, 100, 100, 100 )
 
 //
 
@@ -63,8 +63,12 @@ const material = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
   uniforms: {
     uFrequency: {
-      value: 0
+      value: [0]
     },
+    tAudioData: {
+      value: 0
+    } ,
+
     uTime: {
       value: 0
     },
@@ -137,7 +141,7 @@ window.addEventListener('resize', () =>{
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0.0, 0.0, 1)
+camera.position.set(0.0, 0.0, 1.5)
 scene.add(camera)
 
 
@@ -156,6 +160,27 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.localClippingEnabled = true
 renderer.globalClippingEnabled = true
 
+scene.background = null
+
+const listener = new THREE.AudioListener()
+camera.add( listener )
+
+// create a global audio source
+const sound = new THREE.Audio( listener )
+
+// load a sound and set it as the Audio object's buffer
+const audioLoader = new THREE.AudioLoader()
+audioLoader.load( '/assets/music/Forever.mp3', function( buffer ) {
+  sound.setBuffer( buffer )
+  sound.setLoop( true )
+  sound.setVolume( 0.5 )
+  ready = true
+  // sound.play();
+})
+const analyser = new THREE.AudioAnalyser( sound, 128 )
+
+
+
 /**
  * Animate
  */
@@ -171,7 +196,13 @@ const tick = () =>{
   material.uniforms.uTime.value = elapsedTime
   material.uniforms.uPosition.value = mesh.position
   material.uniforms.uRotation.value = mesh.rotation
-  material.uniforms.uFrequency.value = analyser.getValue()[0]
+  //material.uniforms.uFrequency.value = analyser.getValue()
+  analyser.getFrequencyData()
+
+  if(analyser.data){
+    // console.log(analyser.data)
+    material.uniforms.tAudioData.value = 	 new THREE.DataTexture( analyser.data, 128 / 2, 1,  ( renderer.capabilities.isWebGL2 ) ? THREE.RedFormat : THREE.LuminanceFormat )
+  }
 
   // mesh.rotation.z +=0.001
   // Update controls
@@ -183,7 +214,7 @@ const tick = () =>{
   renderer.render(scene, camera)
 
 
-  console.log(analyser.getValue())
+  // console.log(analyser.getValue())
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick)
