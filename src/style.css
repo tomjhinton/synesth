@@ -1,0 +1,32 @@
+/* @font-face {
+  font-family: "ArtDystopia";
+  src: url("./ArtDystopia.otf") format("opentype");
+} */
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+.texture{
+  /* visibility: hidden;  */
+}
+
+.play{
+  position: fixed;
+  z-index: 1;
+}
