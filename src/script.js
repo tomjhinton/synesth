@@ -172,7 +172,7 @@ const sound = new THREE.Audio( listener )
 const audioLoader = new THREE.AudioLoader()
 audioLoader.load( './assets/music/Forever.mp3', function( buffer ) {
   sound.setBuffer( buffer )
-  sound.setLoop( true )
+  sound.setLoop( false )
   sound.setVolume( 0.5 )
   ready = true
   // sound.play();
